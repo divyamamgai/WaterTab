@@ -35,22 +35,36 @@ label {
   letter-spacing: 0.2rem;
 }
 
+.radio-container {
+  padding: 0.6rem 0 0.3rem 0;
+  margin-bottom: 1.5rem;
+  border: 0;
+  border-radius: 3rem;
+  color: darken($white-dark-color, 25%);
+  background-color: $grey-color;
+}
+
 input[type=radio] {
+  display: inline-block;
   padding: 0;
-  margin: 0 -0.4rem 1.5rem 0.5rem;
+  margin: 0 0 0 1rem;
   outline: none;
 
   & + label {
-    top: -0.1rem;
-    margin-right: 1rem;
+    display: inline-block;
+    top: -0.2rem;
 
     &:last-child {
       margin-right: 0;
     }
   }
 
-  &:focus {
+  &:focus, &:active, &:checked {
     outline: none;
+
+    & + label {
+      color: $white-color;
+    }
   }
 }
 
@@ -136,6 +150,8 @@ input[type=date] {
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9;
+  animation: fadeIn 0.5s $easeInOutQuad;
 
   &.show {
     display: block;
@@ -147,6 +163,7 @@ input[type=date] {
     background-color: $white-color;
     border-radius: 1rem;
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
+    animation: easeBottom 0.5s $easeOutQuad;
 
     .popup-heading {
       margin: 0;
@@ -165,7 +182,30 @@ input[type=date] {
   }
 }
 
-#date {
+#entry-add-button {
+  float: right;
+  margin-right: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes easeBottom {
+  from {
+    top: 10rem;
+  }
+  to {
+    top: 0;
+  }
+}
+
+#table-date, #graph-date {
   display: block;
   width: 100%;
   margin-bottom: 1rem;
@@ -196,11 +236,11 @@ input[type=date] {
   }
 }
 
-#date-total-in {
+#table-date-total-in {
   color: $green-color;
 }
 
-#date-total-out {
+#table-date-total-out {
   color: $yellow-color;
 }
 
@@ -215,6 +255,8 @@ input[type=date] {
     text-transform: uppercase;
     letter-spacing: 0.2rem;
     border-color: $grey-color;
+    background-color: $grey-color;
+    color: $white-dark-color;
 
     &:nth-child(1) {
       width: 24%;
@@ -228,4 +270,24 @@ input[type=date] {
   td {
     border-color: $grey-color;
   }
+}
+
+#view-graph-button, #view-table-button {
+  margin: 1rem -0.5rem 0 0;
+  float: right;
+  z-index: 2;
+}
+
+.graph-canvas-container {
+  width: 100%;
+  height: 50rem;
+
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.padding-0 {
+  padding: 0;
 }

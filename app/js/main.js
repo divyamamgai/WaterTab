@@ -6,6 +6,7 @@
     var dateMap = {};
     var $dateCache = $('<option></option>');
     var $entryCache = $('<tr><td class="hour"></td><td class="in"></td><td class="out"></td></tr>');
+    var graphChart;
 
     function getCurrentDate() {
         var date = new Date();
@@ -45,16 +46,20 @@
             }
             if (dateMap[entry.date][entryHour] === undefined) {
                 dateMap[entry.date][entryHour] = {
-                    inTake: 0,
-                    outTake: 0
+                    intake: 0,
+                    output: 0,
+                    intakes: [],
+                    outputs: []
                 };
             }
             switch (entry.type) {
                 case 'in':
-                    dateMap[entry.date][entryHour].inTake += parseInt(entry.value);
+                    dateMap[entry.date][entryHour].intake += parseInt(entry.value);
+                    dateMap[entry.date][entryHour].intakes.push(entry);
                     break;
                 case 'out':
-                    dateMap[entry.date][entryHour].outTake += parseInt(entry.value);
+                    dateMap[entry.date][entryHour].output += parseInt(entry.value);
+                    dateMap[entry.date][entryHour].outputs.push(entry);
                     break;
             }
         }
@@ -70,36 +75,41 @@
     }
 
     function updateDates() {
-        $objects.date.empty();
+        $objects.tableDate.empty();
+        $objects.graphDate.empty();
         var dates = Object.keys(dateMap).sort().reverse();
         var i;
         for (i = 0; i < dates.length; i++) {
-            $objects.date.append($dateCache.clone().val(dates[i]).text(dates[i]));
+            $objects.tableDate.append($dateCache.clone().val(dates[i]).text(dates[i]));
+            $objects.graphDate.append($dateCache.clone().val(dates[i]).text(dates[i]));
         }
-        $objects.date.val(dates[0]);
+        $objects.tableDate.val(dates[0]);
+        $objects.graphDate.val(dates[0]);
         showDate(dates[0]);
     }
 
     function showDate(date) {
         $objects.entryTableBody.empty();
-        var hours = dateMap[date];
+        var hourMap = dateMap[date];
+        var hours = Object.keys(hourMap).sort();
+        var hour;
         var totalIn = 0;
         var totalOut = 0;
         var $entry;
-        for (var hour in hours) {
-            if (hours.hasOwnProperty(hour)) {
-                $entry = $entryCache.clone();
-                $('.hour', $entry).text(hour);
-                $('.in', $entry).text(hours[hour].inTake);
-                $('.out', $entry).text(hours[hour].outTake);
-                $objects.entryTableBody.append($entry);
-                totalIn += hours[hour].inTake;
-                totalOut += hours[hour].outTake;
-            }
+        var i;
+        for (i = 0; i < hours.length; i++) {
+            hour = hours[i];
+            $entry = $entryCache.clone();
+            $('.hour', $entry).text(hour);
+            $('.in', $entry).text(hourMap[hour].intake);
+            $('.out', $entry).text(hourMap[hour].output);
+            $objects.entryTableBody.append($entry);
+            totalIn += hourMap[hour].intake;
+            totalOut += hourMap[hour].output;
         }
-        $objects.dateTotalIn.text(totalIn);
-        $objects.dateTotalOut.text(totalOut);
-        $objects.dateBalance.text(totalIn - totalOut);
+        $objects.tableDateTotalIn.text(totalIn);
+        $objects.tableDateTotalOut.text(totalOut);
+        $objects.tableDateBalance.text(totalIn - totalOut);
     }
 
     function addEntry(entry) {
@@ -110,16 +120,77 @@
         showDate(entry.date);
     }
 
+    function showDateGraph(date) {
+        var hourMap = dateMap[date];
+        var hours = Object.keys(hourMap).sort();
+        var intakeData = [];
+        var outputData = [];
+        var i;
+        for (i = 0; i < hours.length; i++) {
+            intakeData.push(hourMap[hours[i]].intake);
+            outputData.push(hourMap[hours[i]].output);
+        }
+        graphChart = new Chart($objects.graphCanvas.get(0).getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: hours,
+                datasets: [{
+                    label: 'Intake',
+                    fill: false,
+                    backgroundColor: '#4CAF50',
+                    borderColor: '#4CAF50',
+                    data: intakeData
+                }, {
+                    label: 'Output',
+                    fill: false,
+                    backgroundColor: '#FFC107',
+                    borderColor: '#FFC107',
+                    data: outputData
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Day Chart'
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Hour'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Value'
+                        }
+                    }]
+                }
+            }
+        });
+    }
+
     $(function () {
         check();
         load();
-        $objects.date = $('#date', d);
-        $objects.dateTotalIn = $('#date-total-in', d);
-        $objects.dateTotalOut = $('#date-total-out', d);
-        $objects.dateBalance = $('#date-balance', d);
+        $objects.viewTableButton = $('#view-table-button', d);
+        $objects.viewGraphButton = $('#view-graph-button', d);
+        $objects.viewTable = $('#view-table', d);
+        $objects.viewGraph = $('#view-graph', d);
+        $objects.tableDate = $('#table-date', d);
+        $objects.tableDateTotalIn = $('#table-date-total-in', d);
+        $objects.tableDateTotalOut = $('#table-date-total-out', d);
+        $objects.tableDateBalance = $('#table-date-balance', d);
         $objects.entryTableBody = $('#entry-table tbody', d);
         $objects.popupDateInput = $('#popup-date-input', d);
         $objects.popupTimeInput = $('#popup-time-input', d);
+        $objects.graphDate = $('#graph-date', d);
+        $objects.graphCanvas = $('#graph-canvas', d);
         updateDates();
     });
 
@@ -145,8 +216,24 @@
             $objects.popupDateInput.val(getCurrentDate());
             $objects.popupTimeInput.val(getCurrentTime());
         })
-        .on('change', '#date', function () {
+        .on('change', '#table-date', function () {
             showDate($(this).val());
+        })
+        .on('click', '#view-graph-button', function () {
+            $objects.viewGraphButton.hide();
+            $objects.viewTableButton.show();
+            $objects.viewGraph.show();
+            $objects.viewTable.hide();
+            showDateGraph(Object.keys(dateMap)[0]);
+        })
+        .on('click', '#view-table-button', function () {
+            $objects.viewGraphButton.show();
+            $objects.viewTableButton.hide();
+            $objects.viewGraph.hide();
+            $objects.viewTable.show();
+        })
+        .on('change', '#graph-date', function () {
+            showDateGraph($(this).val());
         });
 
 })(window, document, jQuery, jQuery(window), jQuery(document));
