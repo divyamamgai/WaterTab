@@ -69,6 +69,11 @@ gulp.task('build:dist', function () {
     runSequence('build:css', 'build:dist:fonts', 'build:dist:drawable', 'build:dist:bundle', 'build:dist:html');
 });
 
+gulp.task('copy:dist', function () {
+    return gulp.src('dist/**/*')
+        .pipe(gulp.dest('www/'));
+});
+
 gulp.task('watch', ['browserSync'], function () {
     gulp.watch('app/scss/**/*.scss', ['build:css']);
     gulp.watch('app/*.html', browserSync.reload);
