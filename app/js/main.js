@@ -76,6 +76,8 @@
         for (i = 0; i < dates.length; i++) {
             $objects.date.append($dateCache.clone().val(dates[i]).text(dates[i]));
         }
+        $objects.date.val(dates[0]);
+        showDate(dates[0]);
     }
 
     function showDate(date) {
