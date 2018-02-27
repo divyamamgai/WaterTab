@@ -187,8 +187,10 @@
         $objects.tableDateTotalOut = $('#table-date-total-out', d);
         $objects.tableDateBalance = $('#table-date-balance', d);
         $objects.entryTableBody = $('#entry-table tbody', d);
+        $objects.popupValueInput = $('#popup-value-input', d);
         $objects.popupDateInput = $('#popup-date-input', d);
         $objects.popupTimeInput = $('#popup-time-input', d);
+        $objects.entryAddButton = $('#entry-add-button', d);
         $objects.graphDate = $('#graph-date', d);
         $objects.graphCanvas = $('#graph-canvas', d);
         updateDates();
@@ -203,6 +205,11 @@
             var $popup = $(this).parent().parent().parent().parent();
             $popup.removeClass('show');
         })
+        .on('keypress', '#popup-value-input', function (event) {
+            if (event.which === 13) {
+                $objects.entryAddButton.trigger('click');
+            }
+        })
         .on('click', '#entry-add-button', function () {
             var $popup = $(this).parent().parent().parent().parent();
             var type = $('input[name=type]:checked', $popup).val();
@@ -213,6 +220,7 @@
             $popup.removeClass('show');
         })
         .on('click', '#add-button', function () {
+            $objects.popupValueInput.val('');
             $objects.popupDateInput.val(getCurrentDate());
             $objects.popupTimeInput.val(getCurrentTime());
         })

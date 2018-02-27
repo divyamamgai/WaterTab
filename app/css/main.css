@@ -127,6 +127,8 @@ input[type=date] {
   .popup-container.show {
     display: block; }
   .popup-container .popup-box {
+    position: relative;
+    left: 50%;
     max-width: 400px;
     margin: 1.5rem;
     background-color: #FFFFFF;
@@ -134,7 +136,9 @@ input[type=date] {
     -webkit-box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
             box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
     -webkit-animation: easeBottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            animation: easeBottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+            animation: easeBottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    -webkit-transform: translateX(-50%);
+            transform: translateX(-50%); }
     .popup-container .popup-box .popup-heading {
       margin: 0;
       padding: 1.5rem 0 2rem 0;
