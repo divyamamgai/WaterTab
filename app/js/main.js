@@ -130,14 +130,21 @@
         var intakeData = [];
         var outputData = [];
         var i;
+        var yMax = 700;
         for (i = 0; i < hours.length; i++) {
             intakeData = intakeData.concat(hourMap[hours[i]].intakes.map(function (entry) {
+                if (yMax < entry.value) {
+                    yMax = entry.value;
+                }
                 return {
                     x: timeToHours(entry.time),
                     y: entry.value
                 };
             }));
             outputData = outputData.concat(hourMap[hours[i]].outputs.map(function (entry) {
+                if (yMax < entry.value) {
+                    yMax = entry.value;
+                }
                 return {
                     x: timeToHours(entry.time),
                     y: entry.value
@@ -193,7 +200,9 @@
                         type: 'linear',
                         display: true,
                         ticks: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            min: 0,
+                            max: yMax
                         },
                         scaleLabel: {
                             display: true,
