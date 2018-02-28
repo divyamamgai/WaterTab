@@ -19,7 +19,8 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.3rem;
   font-size: 2.4rem;
-  font-weight: 800; }
+  font-weight: 800;
+  color: #1976D2; }
 
 label {
   padding: 0 0 0 0.5rem;
@@ -120,6 +121,7 @@ input[type=date] {
   left: 0;
   width: 100vw;
   height: 100vh;
+  padding: 1.5rem;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 9;
   -webkit-animation: fadeIn 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955);
@@ -130,7 +132,6 @@ input[type=date] {
     position: relative;
     left: 50%;
     max-width: 400px;
-    margin: 1.5rem;
     background-color: #FFFFFF;
     border-radius: 1rem;
     -webkit-box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);

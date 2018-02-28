@@ -18,6 +18,10 @@
         return ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2);
     }
 
+    function timeToHours(time) {
+        return parseInt(time.split(':')[0]) + (parseInt(time.split(':')[1]) / 60);
+    }
+
     var Entry = function (type, value, date, time) {
         this.type = type.toLowerCase() || 'in';
         this.value = parseInt(value) || 0;
@@ -127,25 +131,40 @@
         var outputData = [];
         var i;
         for (i = 0; i < hours.length; i++) {
-            intakeData.push(hourMap[hours[i]].intake);
-            outputData.push(hourMap[hours[i]].output);
+            intakeData = intakeData.concat(hourMap[hours[i]].intakes.map(function (entry) {
+                return {
+                    x: timeToHours(entry.time),
+                    y: entry.value
+                };
+            }));
+            outputData = outputData.concat(hourMap[hours[i]].outputs.map(function (entry) {
+                return {
+                    x: timeToHours(entry.time),
+                    y: entry.value
+                };
+            }));
         }
         graphChart = new Chart($objects.graphCanvas.get(0).getContext('2d'), {
             type: 'line',
             data: {
-                labels: hours,
                 datasets: [{
+                    borderWidth: 1.5,
+                    pointRadius: 1.5,
                     label: 'Intake',
                     fill: false,
                     backgroundColor: '#4CAF50',
                     borderColor: '#4CAF50',
-                    data: intakeData
+                    data: intakeData,
+                    lineTension: 0
                 }, {
+                    borderWidth: 1.5,
+                    pointRadius: 1.5,
                     label: 'Output',
                     fill: false,
                     backgroundColor: '#FFC107',
                     borderColor: '#FFC107',
-                    data: outputData
+                    data: outputData,
+                    lineTension: 0
                 }]
             },
             options: {
@@ -153,18 +172,29 @@
                 responsive: true,
                 title: {
                     display: true,
-                    text: 'Day Chart'
+                    text: 'Chart for ' + date
                 },
                 scales: {
                     xAxes: [{
+                        type: 'linear',
                         display: true,
+                        ticks: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: 24,
+                            stepSize: 1
+                        },
                         scaleLabel: {
                             display: true,
                             labelString: 'Hour'
                         }
                     }],
                     yAxes: [{
+                        type: 'linear',
                         display: true,
+                        ticks: {
+                            beginAtZero: true
+                        },
                         scaleLabel: {
                             display: true,
                             labelString: 'Value'
@@ -232,7 +262,7 @@
             $objects.viewTableButton.show();
             $objects.viewGraph.show();
             $objects.viewTable.hide();
-            showDateGraph(Object.keys(dateMap)[0]);
+            showDateGraph($objects.graphDate.val());
         })
         .on('click', '#view-table-button', function () {
             $objects.viewGraphButton.show();
